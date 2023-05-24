@@ -1,0 +1,27 @@
+{
+  "Title": "Template Applicator",
+  "Type": "tool",
+  "Org": "local",
+  "Ident": "template_applicator",
+  "Tags": null,
+  "Schema": 1,
+  "HasAssets": true,
+  "AssetsPath": "",
+  "ResourcePaths": null,
+  "HasCode": true,
+  "CodePath": "code",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Metadata": {
+    "ProjectTemplate": null,
+    "CsProjName": "template_applicator",
+    "Compiler": {
+      "RootNamespace": "TemplateApplicator",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;",
+      "Nullables": true,
+      "References": [],
+      "DistinctReferences": []
+    }
+  }
+}
