@@ -11,6 +11,9 @@ A tool to download S&box templates from GitHub.
 ### Feature Showcase
 https://github.com/peter-r-g/Sbox-TemplateDownloader/assets/11802285/255800a3-b117-4192-a9bf-8ed074fed464
 
+## Cannot find your template?
+Make sure your repository has either the `sbox-template` topic or both `sbox` and `template`!
+
 ## Installation
 You can install the tool by downloading this repo or using [Xezno](https://github.com/xezno)s [Tool Manager](https://github.com/xezno/sbox-tools-manager)
 
