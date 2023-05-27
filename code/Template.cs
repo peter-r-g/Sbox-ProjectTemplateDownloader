@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System;
 using TemplateDownloader.Util;
 using Editor;
+using System.Collections.Generic;
+using TemplateDownloader.Util.Json;
 
 namespace TemplateDownloader;
 
@@ -14,24 +16,56 @@ internal sealed class Template
 	/// <summary>
 	/// The GitHub repository that hosts the template.
 	/// </summary>
-	internal GitHubRepository Repository { get; private set; }
+	internal Repository Repository { get; private set; }
+
 	/// <summary>
 	/// The path to the template that the <see cref="ProjectCreator"/> can see.
 	/// </summary>
-	internal string TemplatePath => Path.Combine( Environment.CurrentDirectory,
-												"templates",
-												Repository.Id.ToString() );
+	internal string TemplatePath
+	{
+		get
+		{
+			var path = Path.Combine( Environment.CurrentDirectory,
+				"templates",
+				Repository.Id.ToString() );
+
+			if ( SubDirectory is not null )
+				path += '_' + SubDirectory;
+
+			return path;
+		}
+	}
+
 	/// <summary>
 	/// The path to the templates GitHub repository.
 	/// </summary>
-	internal string CachePath => Path.Combine( Environment.CurrentDirectory,
-											"templates",
-											"githubcache",
-											Repository.Id.ToString() );
+	internal string CachePath
+	{
+		get
+		{
+			var path = Path.Combine( Environment.CurrentDirectory,
+				"templates",
+				"githubcache",
+				Repository.Id.ToString() );
 
-	internal Template( GitHubRepository gitHubRepository )
+			return path;
+		}
+	}
+
+	/// <summary>
+	/// A list containing all of this templates siblings.
+	/// </summary>
+	internal List<Template> Siblings { get; } = new();
+
+	/// <summary>
+	/// The relative path from the GitHub repository that this template is stored in.
+	/// </summary>
+	internal string? SubDirectory { get; }
+
+	internal Template( Repository gitHubRepository, string? subDirectory )
 	{
 		Repository = gitHubRepository;
+		SubDirectory = subDirectory;
 	}
 
 	/// <summary>
@@ -125,6 +159,9 @@ internal sealed class Template
 	/// <summary>
 	/// Downloads the template repository.
 	/// </summary>
+	/// <remarks>
+	/// If this template has siblings, this will also install them.
+	/// </remarks>
 	/// <returns>A task that represents the asynchronous operation.</returns>
 	internal async Task DownloadAsync()
 	{
@@ -138,11 +175,17 @@ internal sealed class Template
 
 		Progress.Update( "Copying files to template directory...", 90, 100 );
 		CopyTemplateToTemplatesDirectory();
+
+		foreach ( var sibling in Siblings )
+			sibling.CopyTemplateToTemplatesDirectory();
 	}
 
 	/// <summary>
 	/// Updates the template repository
 	/// </summary>
+	/// <remarks>
+	/// If this template has siblings, this will also update them.
+	/// </remarks>
 	/// <returns>A task that represents the asynchronous operation.</returns>
 	/// <exception cref="InvalidOperationException">Thrown when this is called while the GitHub repository is not installed.</exception>
 	internal async Task UpdateAsync()
@@ -172,6 +215,9 @@ internal sealed class Template
 
 		Progress.Update( "Copying files to template directory...", 90, 100 );
 		CopyTemplateToTemplatesDirectory();
+
+		foreach ( var sibling in Siblings )
+			sibling.CopyTemplateToTemplatesDirectory();
 	}
 
 	/// <summary>
@@ -188,7 +234,10 @@ internal sealed class Template
 
 		Directory.CreateDirectory( TemplatePath );
 
-		foreach ( var file in Directory.EnumerateFiles( CachePath, "*.*", SearchOption.AllDirectories ) )
+		var sourcePath = SubDirectory is not null
+			? Path.Combine( CachePath, SubDirectory )
+			: CachePath;
+		foreach ( var file in Directory.EnumerateFiles( sourcePath, "*.*", SearchOption.AllDirectories ) )
 		{
 			if ( file.Contains( "/.git/" ) || file.Contains( "\\.git\\" ) )
 				continue;
@@ -201,7 +250,7 @@ internal sealed class Template
 				fileName == "README.md" )
 				continue;
 
-			var relative = Path.GetRelativePath( CachePath, file );
+			var relative = Path.GetRelativePath( sourcePath, file );
 			var directory = Path.GetDirectoryName( relative );
 
 			if ( !string.IsNullOrEmpty( directory ) )
@@ -214,12 +263,12 @@ internal sealed class Template
 	/// <summary>
 	/// Deletes any installed data for the template.
 	/// </summary>
+	/// <remarks>
+	/// If this template has siblings, this will also delete them.
+	/// </remarks>
 	/// <exception cref="InvalidOperationException">Thrown when this is called while the GitHub repository is not installed.</exception>
 	internal void Delete()
 	{
-		if ( !IsInstalled() )
-			throw new InvalidOperationException( "The GitHub repository is not installed" );
-
 		using var progress = Progress.Start( $"Deleting {Repository.FullName}" );
 
 		try
@@ -229,6 +278,9 @@ internal sealed class Template
 
 			Progress.Update( "Deleting github cache...", 45, 100 );
 			RecursiveDeleteDirectory( CachePath );
+
+			foreach ( var sibling in Siblings )
+				sibling.Delete();
 		}
 		catch ( Exception e )
 		{
@@ -245,6 +297,9 @@ internal sealed class Template
 	/// <param name="directory">The directory to recursively delete.</param>
 	private static void RecursiveDeleteDirectory( string directory )
 	{
+		if ( !Directory.Exists( directory ) )
+			return;
+
 		foreach ( string subdirectory in Directory.EnumerateDirectories( directory ) )
 			RecursiveDeleteDirectory( subdirectory );
 

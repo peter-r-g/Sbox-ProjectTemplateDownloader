@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TemplateDownloader.Util.Json;
 
 namespace TemplateDownloader.Util;
 
@@ -61,14 +62,14 @@ internal static class GitHub
 	/// Gets information about a repository.
 	/// </summary>
 	/// <param name="id">The unique ID of the repository.</param>
-	/// <returns>A task that represents the asynchronous operation. The result will either be the found <see cref="GitHubRepository"/> or an error code.</returns>
-	internal static async ValueTask<Result<GitHubRepository, int>> GetRepositoryAsync( int id )
+	/// <returns>A task that represents the asynchronous operation. The result will either be the found <see cref="Repository"/> or an error code.</returns>
+	internal static async ValueTask<Result<Repository, int>> GetRepositoryAsync( int id )
 	{
 		var result = await GetEndpointAsync( "https://api.github.com/repositories/" + id );
 		if ( result.IsError )
 			return result.Error;
 
-		return JsonSerializer.Deserialize<GitHubRepository>( result );
+		return JsonSerializer.Deserialize<Repository>( result.Value! );
 	}
 
 	/// <summary>
@@ -82,6 +83,36 @@ internal static class GitHub
 		if ( result.IsError )
 			return result.Error;
 
-		return JsonSerializer.Deserialize<SearchResult>( result );
+		return JsonSerializer.Deserialize<SearchResult>( result.Value! );
+	}
+
+	/// <summary>
+	/// Gets branch information for a repository.
+	/// </summary>
+	/// <param name="fullName">The full name of the repository to get.</param>
+	/// <param name="branchName">The branch name to get on the repository.</param>
+	/// <returns>A task that represents the asynchronous operation. The result will either be a <see cref="BranchResult"/> or an error code.</returns>
+	internal static async ValueTask<Result<BranchResult, int>> GetBranchAsync( string fullName, string branchName )
+	{
+		var result = await GetEndpointAsync( "https://api.github.com/repos/" + fullName + "/branches/" + branchName );
+		if ( result.IsError )
+			return result.Error;
+
+		return JsonSerializer.Deserialize<BranchResult>( result.Value! );
+	}
+
+	/// <summary>
+	/// Gets a tree from a repository.
+	/// </summary>
+	/// <param name="fullName">The full name of the repository to get.</param>
+	/// <param name="sha1">The SHA1 of the tree to get.</param>
+	/// <returns>A task that represents the asynchronous operation. The result will either be a <see cref="TreeResult"/> or an error code.</returns>
+	internal static async ValueTask<Result<TreeResult, int>> GetTreeAsync( string fullName, string sha1 )
+	{
+		var result = await GetEndpointAsync( "https://api.github.com/repos/" + fullName + "/git/trees/" + sha1 );
+		if ( result.IsError )
+			return result.Error;
+
+		return JsonSerializer.Deserialize<TreeResult>( result.Value! );
 	}
 }

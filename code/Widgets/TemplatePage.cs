@@ -64,7 +64,13 @@ internal class TemplatePage : Widget
 
 		// Header/toolbar.
 		{
-			Header = Layout.Add( new TemplateHeader( Template.Repository.Name ) );
+			string headerName;
+			if ( Template.SubDirectory is not null )
+				headerName = Template.SubDirectory + " (" + Template.Repository.FullName + ")";
+			else
+				headerName = Template.Repository.Name;
+
+			Header = Layout.Add( new TemplateHeader( headerName ) );
 			Layout.AddSpacingCell( 8 );
 
 			RefreshToolBar();
@@ -90,7 +96,7 @@ internal class TemplatePage : Widget
 	/// <summary>
 	/// Refreshes the tool bar and action buttons on the page.
 	/// </summary>
-	private void RefreshWindow()
+	internal void RefreshWindow()
 	{
 		RefreshToolBar();
 		RefreshButtonDrawer();
