@@ -1,8 +1,8 @@
 {
-  "Title": "Template Applicator",
+  "Title": "Template Downloader",
   "Type": "tool",
-  "Org": "local",
-  "Ident": "template_applicator",
+  "Org": "gooman",
+  "Ident": "template_downloader",
   "Tags": null,
   "Schema": 1,
   "HasAssets": true,
@@ -14,9 +14,9 @@
   "EditorReferences": null,
   "Metadata": {
     "ProjectTemplate": null,
-    "CsProjName": "template_applicator",
+    "CsProjName": "template_downloader",
     "Compiler": {
-      "RootNamespace": "TemplateApplicator",
+      "RootNamespace": "TemplateDownloader",
       "DefineConstants": "SANDBOX;ADDON;DEBUG",
       "NoWarn": "1701;1702;1591;",
       "Nullables": true,
