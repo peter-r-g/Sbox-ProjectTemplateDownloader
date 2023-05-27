@@ -13,22 +13,22 @@ internal sealed class Result<TValue, TError>
 	/// <summary>
 	/// The value.
 	/// </summary>
-	internal TValue? Value { get; }
+	internal TValue? Value { get; } = default;
 	/// <summary>
 	/// The error.
 	/// </summary>
-	internal TError? Error { get; }
+	internal TError? Error { get; } = default;
 
 	/// <summary>
 	/// Returns whether or not this result is a value.
 	/// </summary>
 	[MemberNotNullWhen( true, nameof( Value ) )]
-	internal bool HasValue => Value is not null;
+	internal bool HasValue { get; }
 	/// <summary>
 	/// Returns whether or not this result is an error.
 	/// </summary>
 	[MemberNotNullWhen( true, nameof( Error ) )]
-	internal bool IsError => !HasValue;
+	internal bool IsError { get; }
 
 	/// <summary>
 	/// Creates a new <see cref="Result{TValue, TError}"/> from a successful value.
@@ -37,6 +37,8 @@ internal sealed class Result<TValue, TError>
 	internal Result( TValue value )
 	{
 		Value = value;
+		HasValue = true;
+		IsError = false;
 	}
 
 	/// <summary>
@@ -46,6 +48,15 @@ internal sealed class Result<TValue, TError>
 	internal Result( TError error )
 	{
 		Error = error;
+		HasValue = false;
+		IsError = true;
+	}
+
+	public override string ToString()
+	{
+		return HasValue
+			? $"{GetType().Name}: Has value ({Value})"
+			: $"{GetType().Name}: Has error ({Error})";
 	}
 
 	public static implicit operator TValue( Result<TValue, TError> result )
