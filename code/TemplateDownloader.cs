@@ -87,18 +87,9 @@ public sealed class TemplateDownloader : BaseWindow
 			return;
 		}
 
-		// FIXME: Remove when FP add nice tags to their repo. This ID points to sboxgame/templates.
-		var thirdResult = await GitHub.GetRepositoryAsync( 570947471 );
-		if ( thirdResult.IsError )
-		{
-			Log.Error( "Failed to search GitHub API for sboxgame/templates repo" );
-			return;
-		}
-
 		Progress.Update( "Populating list...", 90, 100 );
 		var firstProcessTask = ProcessSearch( firstResult );
 		var secondProcessTask = ProcessSearch( secondResult );
-		var thirdProcessTask = ProcessRepository( thirdResult );
 
 		await Task.WhenAll( firstProcessTask, secondProcessTask );
 
