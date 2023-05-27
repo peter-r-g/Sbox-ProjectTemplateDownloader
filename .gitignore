@@ -394,5 +394,5 @@ FodyWeavers.xsd
 .idea/
 
 # Custom
-code/template_applicator.csproj
+code/template_downloader.csproj
 code/Properties/launchSettings.json
