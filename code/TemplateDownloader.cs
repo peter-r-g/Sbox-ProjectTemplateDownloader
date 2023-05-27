@@ -217,7 +217,7 @@ public sealed class TemplateDownloader : BaseWindow
 		{
 			foreach ( var otherSibling in siblingTemplates )
 			{
-				if ( sibling != otherSibling )
+				if ( !ReferenceEquals( sibling, otherSibling ) )
 					sibling.Siblings.Add( otherSibling );
 			}
 		}

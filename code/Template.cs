@@ -269,6 +269,17 @@ internal sealed class Template
 	/// <exception cref="InvalidOperationException">Thrown when this is called while the GitHub repository is not installed.</exception>
 	internal void Delete()
 	{
+		DeleteInternal();
+
+		foreach ( var sibling in Siblings )
+			sibling.DeleteInternal();
+	}
+
+	/// <summary>
+	/// The internal method to deleting data. This is to prevent infinite recursion in sibling calls.
+	/// </summary>
+	private void DeleteInternal()
+	{
 		using var progress = Progress.Start( $"Deleting {Repository.FullName}" );
 
 		try
@@ -278,9 +289,6 @@ internal sealed class Template
 
 			Progress.Update( "Deleting github cache...", 45, 100 );
 			RecursiveDeleteDirectory( CachePath );
-
-			foreach ( var sibling in Siblings )
-				sibling.Delete();
 		}
 		catch ( Exception e )
 		{
