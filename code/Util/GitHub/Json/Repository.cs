@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace TemplateDownloader;
+namespace TemplateDownloader.Util.Json;
 
 /// <summary>
 /// Contains all necessary information for a GitHub repository.
 /// </summary>
-public struct GitHubRepository
+public struct Repository
 {
 	/// <summary>
 	/// The unique ID given to the repository.

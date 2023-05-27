@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TemplateDownloader;
+namespace TemplateDownloader.Util.Json;
 
 /// <summary>
 /// Contains all necessary information for a GitHub search result.
@@ -17,5 +17,5 @@ public struct SearchResult
 	/// An array containing all of the repositories found in the search.
 	/// </summary>
 	[JsonPropertyName( "items" )]
-	public GitHubRepository[] Repositories { get; set; }
+	public Repository[] Repositories { get; set; }
 }
