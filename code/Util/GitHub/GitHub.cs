@@ -1,10 +1,8 @@
-﻿using Sandbox;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TemplateDownloader.Extensions;
 
 namespace TemplateDownloader.Util;
 
@@ -17,10 +15,6 @@ internal static class GitHub
 	/// A dedicated client for interacting with the GitHub API.
 	/// </summary>
 	private static HttpClient Client { get; set; }
-	/// <summary>
-	/// The time in seconds until the API can be used again.
-	/// </summary>
-	private static RealTimeUntil TimeUntilCanUseApi { get; set; }
 
 	/// <summary>
 	/// A thread-safe dictionary containing all of the currently cached endpoints.
@@ -48,19 +42,14 @@ internal static class GitHub
 		if ( CachedEndpoints.TryGetValue( url, out var cachedEndpoint ) && cachedEndpoint.ExpiresIn > 0 )
 			return cachedEndpoint.Result;
 
-		// Check if we're rate limited.
-		if ( TimeUntilCanUseApi > 0 )
-			return 1;
-
 		var response = await Client.GetAsync( url );
 		var content = await response.Content.ReadAsStringAsync();
 
-		// Update rate limit info.
-		var rateLimit = response.GetRateLimitInfo();
-		if ( rateLimit.Remaining <= 0 )
+		// Check if we're now rate limited.
+		if ( content.Contains( "API rate limit exceeded for" ) )
 		{
-			var timestamp = DateTime.UnixEpoch.AddSeconds( rateLimit.Remaining );
-			TimeUntilCanUseApi = (float)(timestamp - DateTime.Now).TotalSeconds;
+			Log.Error( "GitHub is now refusing API requests (Rate limit exceeded)" );
+			return 2;
 		}
 
 		// Add endpoint to cache and return.
