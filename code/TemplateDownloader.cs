@@ -51,7 +51,7 @@ public sealed class TemplateDownloader : BaseWindow
 
 		Progress.Update( "Searching for repositories with \"sbox-template\" or \"sbox\" and \"template\" topics...", 10, 100 );
 		var firstTask = GitHub.SearchAsync( "topic:sbox-template" );
-		var secondTask = GitHub.SearchAsync( "topic:sbox+template" );
+		var secondTask = GitHub.SearchAsync( "topic:sbox+topic:template" );
 
 		var firstResult = await firstTask;
 		if ( firstResult.IsError )
@@ -63,7 +63,7 @@ public sealed class TemplateDownloader : BaseWindow
 		var secondResult = await secondTask;
 		if ( secondResult.IsError )
 		{
-			Log.Error( "Failed to search GitHub API for topic:sbox+template" );
+			Log.Error( "Failed to search GitHub API for topic:sbox+topic:template" );
 			return;
 		}
 
