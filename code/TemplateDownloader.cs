@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TemplateDownloader.Extensions;
 using TemplateDownloader.Util;
 using TemplateDownloader.Util.Json;
+using TemplateDownloader.Widgets;
 
 namespace TemplateDownloader;
 
