@@ -18,8 +18,7 @@ public sealed class TemplateDownloader : BaseWindow
 	/// </summary>
 	internal static TemplateDownloader? Instance { get; private set; }
 
-	private NavigationView Templates { get; set; } = null!;
-	private Dictionary<NavigationView.Option, TemplatePage> Pages { get; set; } = new();
+	private PaginatedNavigationView Templates { get; set; } = null!;
 
 	public TemplateDownloader()
 	{
@@ -30,28 +29,10 @@ public sealed class TemplateDownloader : BaseWindow
 		SetWindowIcon( MaterialIcon.Storage );
 
 		SetLayout( LayoutMode.LeftToRight );
-		SetupWindow();
+		Templates = Layout.Add( new PaginatedNavigationView() );
 		Show();
 
 		_ = RefreshTemplatesAsync();
-	}
-
-	/// <summary>
-	/// Sets up the tool window.
-	/// </summary>
-	private void SetupWindow()
-	{
-		// FIXME: NavigationView does not have any kind of scrolling behavior.
-		Templates = Layout.Add( new NavigationView( this ) );
-
-		var footer = Templates.MenuBottom.AddRow();
-		footer.Spacing = 4;
-
-		var refreshButton = new Button.Primary( "Refresh", MaterialIcon.Refresh )
-		{
-			Clicked = () => _ = RefreshTemplatesAsync()
-		};
-		footer.Add( refreshButton, 1 );
 	}
 
 	/// <summary>
@@ -67,7 +48,6 @@ public sealed class TemplateDownloader : BaseWindow
 
 		Progress.Update( "Setting up...", 1, 100 );
 		Templates.ClearPages();
-		Pages.Clear();
 
 		Progress.Update( "Searching for repositories with \"sbox-template\" or \"sbox\" and \"template\" topics...", 10, 100 );
 		var firstTask = GitHub.SearchAsync( "topic:sbox-template" );
@@ -93,7 +73,7 @@ public sealed class TemplateDownloader : BaseWindow
 
 		await Task.WhenAll( firstProcessTask, secondProcessTask );
 
-		if ( Pages.Count == 0 )
+		if ( Templates.Options.Count == 0 )
 		{
 			Templates.AddPage( "No Templates Found!", MaterialIcon.Error );
 			return;
@@ -102,13 +82,12 @@ public sealed class TemplateDownloader : BaseWindow
 		if ( string.IsNullOrEmpty( currentOptionName ) )
 			return;
 
-		foreach ( var (option, page) in Pages )
+		foreach ( var option in Templates.Options )
 		{
 			if ( option.Title != currentOptionName )
 				continue;
 
 			Templates.CurrentOption = option;
-			Templates.CurrentPage = page;
 		}
 	}
 
@@ -248,12 +227,11 @@ public sealed class TemplateDownloader : BaseWindow
 		else
 			optionText = gitHubRepository.FullName;
 
-		var option = new NavigationView.Option( optionText, icon )
+		var option = new VirtualOption( optionText, icon )
 		{
 			Page = page
 		};
 
-		Pages.Add( option, page );
 		Templates.AddPage( option );
 
 		return template;
@@ -265,8 +243,11 @@ public sealed class TemplateDownloader : BaseWindow
 	[EditorEvent.Frame]
 	private void UpdateIcons()
 	{
-		foreach ( var (option, templatePage) in Pages )
+		foreach ( var option in Templates.Options )
 		{
+			if ( option.Page is not TemplatePage templatePage )
+				continue;
+
 			var template = templatePage.Template;
 
 			var icon = template.IsInstalled() switch
