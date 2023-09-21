@@ -29,7 +29,7 @@ public sealed class TemplateDownloader : BaseWindow
 		WindowTitle = "Template Downloader";
 		SetWindowIcon( MaterialIcon.Storage );
 
-		SetLayout( LayoutMode.LeftToRight );
+		this.SetLayout( LayoutMode.LeftToRight );
 		Templates = Layout.Add( new PaginatedNavigationView() );
 		Show();
 

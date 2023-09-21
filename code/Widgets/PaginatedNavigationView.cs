@@ -228,7 +228,7 @@ public class PaginatedNavigationView : Widget
 	/// <param name="parent">The parent of this widget.</param>
 	public PaginatedNavigationView( Widget? parent = null ) : base( parent )
 	{
-		SetLayout( LayoutMode.LeftToRight );
+		this.SetLayout( LayoutMode.LeftToRight );
 
 		MenuContainer = new Widget( this );
 		MenuContainer.SetLayout( LayoutMode.TopToBottom );
@@ -252,7 +252,7 @@ public class PaginatedNavigationView : Widget
 		MenuBottom = MenuContainer.Layout.Add( LayoutMode.BottomToTop );
 
 		PageButtons = MenuBottom.AddRow();
-		PageButtons.HorizontalSpacing = 4;
+		PageButtons.Spacing = 4;
 
 		Rebuild();
 	}
@@ -395,7 +395,7 @@ public class PaginatedNavigationView : Widget
 		PageButtons.Add( LeftPageButton );
 
 		SpecificPageButtonLayout = PageButtons.AddRow();
-		SpecificPageButtonLayout.HorizontalSpacing = 2;
+		SpecificPageButtonLayout.Spacing = 2;
 
 		// Handle special cases so that we can try to always have 3 page buttons visible.
 		int startPoint = PageNumber switch

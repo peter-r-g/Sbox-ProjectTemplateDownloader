@@ -54,7 +54,7 @@ internal class TemplatePage : Widget
 	{
 		// Setup.
 		{
-			SetLayout( LayoutMode.TopToBottom );
+			this.SetLayout( LayoutMode.TopToBottom );
 
 			Layout.Spacing = 8;
 			Layout.Margin = 24;
@@ -181,7 +181,7 @@ internal class TemplatePage : Widget
 	/// </summary>
 	private void OpenGitHubPage()
 	{
-		Utility.OpenFolder( Template.Repository.Url );
+		EditorUtility.OpenFolder( Template.Repository.Url );
 	}
 
 	/// <summary>
@@ -189,7 +189,7 @@ internal class TemplatePage : Widget
 	/// </summary>
 	private void OpenTemplateInExplorer()
 	{
-		Utility.OpenFolder( Template.TemplatePath );
+		EditorUtility.OpenFolder( Template.TemplatePath );
 	}
 
 	/// <summary>
@@ -197,7 +197,7 @@ internal class TemplatePage : Widget
 	/// </summary>
 	private void OpenCachedRepoInExplorer()
 	{
-		Utility.OpenFolder( Template.CachePath );
+		EditorUtility.OpenFolder( Template.CachePath );
 	}
 
 	/// <summary>

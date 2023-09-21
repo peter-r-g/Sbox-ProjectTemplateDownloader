@@ -1,4 +1,5 @@
 ﻿using Editor;
+using TemplateDownloader.Util;
 
 namespace TemplateDownloader;
 
@@ -19,7 +20,7 @@ internal sealed class TemplateHeader : Widget
 		Title = title;
 		Height = HeaderHeight;
 
-		SetLayout( LayoutMode.TopToBottom );
+		this.SetLayout( LayoutMode.TopToBottom );
 	}
 
 	/// <inheritdoc/>
